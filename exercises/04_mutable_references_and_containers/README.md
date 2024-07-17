@@ -227,6 +227,10 @@ error[E0502]: cannot borrow `my_vec` as immutable because it is also borrowed as
 
 Can you explain why this error occurs? Write it out in 50 words or less.
 
+Line 11 borrows my_vec mutably and line 13 borrows it immutably.
+Both are invalid borrows since it's already borrowed mutably by line 10.
+Because just one lifetime is used, the borrow on line 10 persists until the end of the block, making both line 11 and line 13 invalid.
+
 ## Exercise Part 2: Writing Our Own
 
 Add appropriate lifetimes to the function in the exercise.
