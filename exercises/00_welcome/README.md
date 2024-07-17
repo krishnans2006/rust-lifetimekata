@@ -130,3 +130,5 @@ with the next chapter!
 
 If you aren't sure you understand the above, before reading on,
 [complete the rustlings exercises about lifetimes](https://github.com/rust-lang/rustlings/tree/main/exercises/16_lifetimes).
+
+Done [here](https://github.com/krishnans2006/rustlings/tree/main/exercises/16_lifetimes).
