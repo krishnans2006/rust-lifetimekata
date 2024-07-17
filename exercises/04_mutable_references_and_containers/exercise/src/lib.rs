@@ -31,8 +31,10 @@ use require_lifetimes::require_lifetimes;
 /// assert_eq!(message , vec!["Hello", "Your", "Name", "Is", "Unknown"]);
 /// ````
 #[require_lifetimes(!)]
-pub fn vector_set(vector: &mut Vec<&str>, loc: usize, new: &str) {
+pub fn vector_set<'a, 'b>(vector: &'a mut Vec<&'b str>, loc: usize, new: &'b str) {
     // TODO: You will need to write this code yourself.
     //       Don't worry, it's only one line long.
-    todo!()
+    if loc < vector.len() {
+        vector[loc] = new;
+    }
 }
