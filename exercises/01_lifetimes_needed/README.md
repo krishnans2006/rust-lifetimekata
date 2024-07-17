@@ -138,6 +138,7 @@ fn example_1() {
     let x = 4;
     let x_ref = identity(&x);
     assert_eq!(*x_ref, 4);
+    // x_ref is not used or returned after this point! So it's fine.
 }
 
 # // This is always going to cause a dangling reference.
@@ -147,6 +148,7 @@ fn example_2() {
         let x = 7;
         x_ref = Some(identity(&x));
     }
+    // Now x_ref is invalid (dangling!)
     assert_eq!(*x_ref.unwrap(), 7);
 }
 ```
@@ -163,6 +165,7 @@ fn example_1() {
     let x = 8;
     let y = 10;
     let my_number = Some(&x);
+    // my_number is Some, so option_or returns &x
     assert_eq!(&x, option_or(my_number, &y));
 }
 
@@ -170,8 +173,8 @@ fn example_1() {
 fn example_2() {
     let answer = {
         let y = 4;
-        option_or(None, &y)
-    };
+        option_or(None, &y)  // Returns &y
+    };  // Returns &y which is now invalid
     assert_eq!(answer, &4);
 }
 
@@ -180,7 +183,7 @@ fn example_3() {
     let y = 4;
     let answer = {
         option_or(None, &y)
-    };
+    };  // Returns &y but it's still valid
     assert_eq!(answer, &4);
 }
 
@@ -189,8 +192,8 @@ fn example_4() {
     let y = 4;
     let answer = {
         let x = 7;
-        option_or(Some(&x), &y)
-    };
+        option_or(Some(&x), &y)  // Returns &x
+    };  // Returns &x which is now invalid
     assert_eq!(answer, &7);
 }
 ```
