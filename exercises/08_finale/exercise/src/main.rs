@@ -124,6 +124,7 @@ impl<'a, 'b> Matcher<'a> {
                     }
                 },
                 MatcherToken::WildCard => {
+                    matches.push((&token, &string[string_pointer..string_pointer+1]));
                     string_pointer += 1;
                     self.most_tokens_matched += 1;
                 }
