@@ -107,6 +107,7 @@ impl<'a, 'b> Matcher<'a> {
                     }
                     let new_string_pointer = string_pointer + text.len();
                     matches.push((&token, &string[string_pointer..new_string_pointer]));
+                    self.most_tokens_matched += 1;
                     string_pointer = new_string_pointer;
                 },
                 MatcherToken::OneOfText(options) => {
@@ -114,6 +115,7 @@ impl<'a, 'b> Matcher<'a> {
                         if (&string[string_pointer..]).starts_with(text) {
                             let new_string_pointer = string_pointer + text.len();
                             matches.push((&token, &string[string_pointer..new_string_pointer]));
+                            self.most_tokens_matched += 1;
                             string_pointer = new_string_pointer;
                             break;
                         }
@@ -123,6 +125,7 @@ impl<'a, 'b> Matcher<'a> {
                 },
                 MatcherToken::WildCard => {
                     string_pointer += 1;
+                    self.most_tokens_matched += 1;
                 }
             }
             if string_pointer > string.len() {
