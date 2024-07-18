@@ -23,7 +23,7 @@ struct Matcher<'a> {
     most_tokens_matched: usize,
 }
 
-impl<'a> Matcher<'a> {
+impl<'a, 'b> Matcher<'a> {
     /// This should take a string reference, and return
     /// an `Matcher` which has parsed that reference.
     #[require_lifetimes]
@@ -82,10 +82,10 @@ impl<'a> Matcher<'a> {
     /// This should take a string, and return a vector of tokens, and the corresponding part
     /// of the given string. For examples, see the test cases below.
     #[require_lifetimes]
-    fn match_string(&mut self, string: &'a str) -> Vec<(&'a MatcherToken, &'a str)> {
+    fn match_string(&'_ mut self, string: &'b str) -> Vec<(&'b MatcherToken, &'b str)> {
         let mut string_pointer = 0;
 
-        let mut matches: Vec<(&'a MatcherToken, &'a str)> = Vec::new();
+        let mut matches: Vec<(&'b MatcherToken, &'b str)> = Vec::new();
 
         for token in &self.tokens {
             match token {
