@@ -39,13 +39,17 @@ impl<'a, 'b> Matcher<'a> {
         for (i, c) in text.chars().enumerate() {
             if c == '.' {
                 if in_text_block {
-                    tokens.push(MatcherToken::RawText(&text[text_start..(i+1)]));
+                    tokens.push(MatcherToken::RawText(&text[text_start..i])); // Not including i (".")
                     in_text_block = false;
                 }
                 tokens.push(MatcherToken::WildCard);
             } else if c == '(' {
                 if in_or_block {
                     return None;
+                }
+                if in_text_block {
+                    tokens.push(MatcherToken::RawText(&text[text_start..i]));  // Not including i ("(")
+                    in_text_block = false;
                 }
                 in_or_block = true;
             } else if c == ')' {
@@ -62,7 +66,7 @@ impl<'a, 'b> Matcher<'a> {
                 if !in_text_block {
                     return None;
                 }
-                or_options.push(&text[text_start..(i+1)]);
+                or_options.push(&text[text_start..i]);  // Not including i ("|")
                 in_text_block = false;
             } else {
                 if !in_text_block {
@@ -70,6 +74,10 @@ impl<'a, 'b> Matcher<'a> {
                     text_start = i;
                 }
             }
+        }
+
+        if in_or_block {
+            return None;
         }
 
         return Some(Matcher {
