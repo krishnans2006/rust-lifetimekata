@@ -82,8 +82,43 @@ impl<'a> Matcher<'a> {
     /// This should take a string, and return a vector of tokens, and the corresponding part
     /// of the given string. For examples, see the test cases below.
     #[require_lifetimes]
-    fn match_string(&mut self, string: &str) -> Vec<(&MatcherToken, &str)> {
-        todo!()
+    fn match_string(&mut self, string: &'a str) -> Vec<(&'a MatcherToken, &'a str)> {
+        let mut string_pointer = 0;
+
+        let mut matches: Vec<(&'a MatcherToken, &'a str)> = Vec::new();
+
+        for token in &self.tokens {
+            match token {
+                MatcherToken::RawText(text) => {
+                    if !(&string[string_pointer..].starts_with(text)) {
+                        return matches;
+                    }
+                    let new_string_pointer = string_pointer + text.len();
+                    matches.push((&token, &string[string_pointer..new_string_pointer]));
+                    string_pointer = new_string_pointer;
+                },
+                MatcherToken::OneOfText(options) => {
+                    for text in options {
+                        if (&string[string_pointer..]).starts_with(text) {
+                            let new_string_pointer = string_pointer + text.len();
+                            matches.push((&token, &string[string_pointer..new_string_pointer]));
+                            string_pointer = new_string_pointer;
+                            break;
+                        }
+                        // At this point, none of the options matched...
+                        return matches;
+                    }
+                },
+                MatcherToken::WildCard => {
+                    string_pointer += 1;
+                }
+            }
+            if string_pointer > string.len() {
+                return matches;
+            }
+        }
+
+        return matches;
     }
 }
 
