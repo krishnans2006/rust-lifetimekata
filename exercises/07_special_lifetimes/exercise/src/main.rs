@@ -1,12 +1,12 @@
 use std::collections::HashSet;
 
-struct UniqueWords<'a> {
-    sentence: &'a str,
-    unique_words: Vec<&'a str>,
+struct UniqueWords {
+    sentence: &'static str,
+    unique_words: Vec<&'static str>,
 }
 
-impl<'a> UniqueWords<'a> {
-    fn new(sentence: &'a str) -> UniqueWords<'a> {
+impl UniqueWords {
+    fn new(sentence: &'static str) -> UniqueWords {
         let unique_words = sentence
             .split(' ')
             .collect::<HashSet<_>>()
@@ -19,7 +19,7 @@ impl<'a> UniqueWords<'a> {
         }
     }
 
-    fn get_sorted_words<'b>(&'b self) -> Vec<&'a str> {
+    fn get_sorted_words(&self) -> Vec<&'static str> {
         let mut unique_words = self.unique_words.clone();
         unique_words.sort();
         unique_words
