@@ -95,8 +95,9 @@ impl<'a, 'b> Matcher<'a> {
     /// of the given string. For examples, see the test cases below.
     #[require_lifetimes]
     fn match_string(&'_ mut self, string: &'b str) -> Vec<(&'b MatcherToken, &'b str)> {
-        let mut string_pointer = 0;
+        self.most_tokens_matched = 0;
 
+        let mut string_pointer = 0;
         let mut matches: Vec<(&'b MatcherToken, &'b str)> = Vec::new();
 
         for token in &self.tokens {
@@ -125,8 +126,8 @@ impl<'a, 'b> Matcher<'a> {
                 },
                 MatcherToken::WildCard => {
                     matches.push((&token, &string[string_pointer..string_pointer+1]));
-                    string_pointer += 1;
                     self.most_tokens_matched += 1;
+                    string_pointer += 1;
                 }
             }
             if string_pointer > string.len() {
