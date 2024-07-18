@@ -56,7 +56,11 @@ impl<'a, 'b> Matcher<'a> {
                 if !in_or_block {
                     return None;
                 }
+                if in_text_block {
+                    or_options.push(&text[text_start..i]);  // Not including i (")")
+                }
                 in_or_block = false;
+                in_text_block = false;
                 tokens.push(MatcherToken::OneOfText(or_options));
                 or_options = Vec::new();
             } else if c == '|' {
@@ -141,6 +145,8 @@ mod test {
     fn simple_test() {
         let match_string = "abc(d|e|f).".to_string();
         let mut matcher = Matcher::new(&match_string).unwrap();
+
+        println!("{matcher:?}");
 
         assert_eq!(matcher.most_tokens_matched, 0);
 
