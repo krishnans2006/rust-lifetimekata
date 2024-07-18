@@ -1,34 +1,82 @@
 use require_lifetimes::require_lifetimes;
 
 #[derive(Debug, PartialEq, Eq)]
-enum MatcherToken {
+enum MatcherToken<'a> {
     /// This is just text without anything special.
-    RawText(&str),
+    RawText(&'a str),
     /// This is when text could be any one of multiple
     /// strings. It looks like `(one|two|three)`, where
     /// `one`, `two` or `three` are the allowed strings.
-    OneOfText(Vec<&str>),
+    OneOfText(Vec<&'a str>),
     /// This is when you're happy to accept any single character.
     /// It looks like `.`
     WildCard,
 }
 
 #[derive(Debug, PartialEq, Eq)]
-struct Matcher {
+struct Matcher<'a> {
     /// This is the actual text of the matcher
-    text: &str,
+    text: &'a str,
     /// This is a vector of the tokens inside the expression.
-    tokens: Vec<MatcherToken>,
+    tokens: Vec<MatcherToken<'a>>,
     /// This keeps track of the most tokens that this matcher has matched.
     most_tokens_matched: usize,
 }
 
-impl Matcher {
+impl<'a> Matcher<'a> {
     /// This should take a string reference, and return
     /// an `Matcher` which has parsed that reference.
     #[require_lifetimes]
-    fn new(text: &str) -> Option<Matcher> {
-        todo!()
+    fn new(text: &'a str) -> Option<Matcher<'a>> {
+        let mut tokens: Vec<MatcherToken> = Vec::new();
+
+        let mut in_text_block = false;
+        let mut text_start: usize = 0;
+
+        let mut in_or_block = false;
+        let mut or_options: Vec<&str> = Vec::new();
+
+        for (i, c) in text.chars().enumerate() {
+            if c == '.' {
+                if in_text_block {
+                    tokens.push(MatcherToken::RawText(&text[text_start..(i+1)]));
+                    in_text_block = false;
+                }
+                tokens.push(MatcherToken::WildCard);
+            } else if c == '(' {
+                if in_or_block {
+                    return None;
+                }
+                in_or_block = true;
+            } else if c == ')' {
+                if !in_or_block {
+                    return None;
+                }
+                in_or_block = false;
+                tokens.push(MatcherToken::OneOfText(or_options));
+                or_options = Vec::new();
+            } else if c == '|' {
+                if !in_or_block {
+                    return None;
+                }
+                if !in_text_block {
+                    return None;
+                }
+                or_options.push(&text[text_start..(i+1)]);
+                in_text_block = false;
+            } else {
+                if !in_text_block {
+                    in_text_block = true;
+                    text_start = i;
+                }
+            }
+        }
+
+        return Some(Matcher {
+            text,
+            tokens,
+            most_tokens_matched: 0
+        });
     }
 
     /// This should take a string, and return a vector of tokens, and the corresponding part
