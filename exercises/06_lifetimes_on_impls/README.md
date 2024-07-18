@@ -147,6 +147,10 @@ Specifically:
     }
 ```
 
+The returned string (the next word) will force the mutable borrow of the iterator to last as long as the next word does.
+This is bad.
+The returned string should not be related to the lifetime of the borrow of self.
+
 ### Example 2
 ``` rust,ignore
     /// Gives the next word. `None` if there aren't any words left.
@@ -155,6 +159,8 @@ Specifically:
         // ...
     }
 ```
+
+This works - the returned string (next word) will live as long as it needs to.
 
 ### Example 3
 ``` rust,ignore
@@ -167,6 +173,8 @@ Specifically:
     }
 ```
 
+This works as well, since the returned string's lifetime is no longer related to the reference of self but instead to the lifetime from the struct's declaration.
+
 ### Example 4
 ``` rust,ignore
     /// Gives the next word. `None` if there aren't any words left.
@@ -175,3 +183,5 @@ Specifically:
         // ...
     }
 ```
+
+Because of Rust's lifetime elision, this expands to example 1, which is bad.
